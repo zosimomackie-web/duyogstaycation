@@ -769,13 +769,97 @@ function togglePayment(cb) {
   cb.closest('.payment-card').classList.toggle('selected', cb.checked);
 }
 
+// ─── BLOCKED DATES (Airbnb iCal via Apps Script) ──────────
+let blockedDates = [];
+
+async function fetchBlockedDates(unit) {
+  blockedDates = [];
+  const checkin = document.getElementById('checkin');
+  const checkout = document.getElementById('checkout');
+  checkin.value = '';
+  checkout.value = '';
+  document.getElementById('nights-banner').style.display = 'none';
+
+  checkin.disabled = true;
+  checkout.disabled = true;
+
+  showToast('Loading availability for ' + unit + '…');
+
+  try {
+    const res = await fetch(`${APPS_SCRIPT_URL}?action=getBlockedDates&unit=${encodeURIComponent(unit)}`);
+    const json = await res.json();
+    blockedDates = json.dates || [];
+    showToast('Availability loaded for ' + unit + '.');
+  } catch (err) {
+    showToast('Could not load availability. Dates may not be accurate.', true);
+  } finally {
+    checkin.disabled = false;
+    checkout.disabled = false;
+    const today = new Date().toISOString().split('T')[0];
+    checkin.min = today;
+    checkout.min = today;
+  }
+}
+
+function isBlocked(dateStr) {
+  return blockedDates.includes(dateStr);
+}
+
+function isRangeBlocked(startStr, endStr) {
+  const start = new Date(startStr);
+  const end = new Date(endStr);
+  return blockedDates.some(d => {
+    const bd = new Date(d);
+    return bd >= start && bd < end;
+  });
+}
+
+// Fetch blocked dates when unit is selected
+document.getElementById('unit').addEventListener('change', function() {
+  if (this.value) fetchBlockedDates(this.value);
+});
+
 // ─── DATE LOGIC ───────────────────────────────────────────
 const today = new Date().toISOString().split('T')[0];
 document.getElementById('checkin').min = today;
 document.getElementById('checkout').min = today;
 
-document.getElementById('checkin').addEventListener('change', updateNights);
-document.getElementById('checkout').addEventListener('change', updateNights);
+document.getElementById('checkin').addEventListener('change', function() {
+  const val = this.value;
+  if (!val) return;
+  if (isBlocked(val)) {
+    showToast('That check-in date is already booked. Please choose another.', true);
+    this.value = '';
+    return;
+  }
+  // Set checkout min to day after checkin
+  const next = new Date(val);
+  next.setDate(next.getDate() + 1);
+  document.getElementById('checkout').min = next.toISOString().split('T')[0];
+  // Clear checkout if now invalid
+  const co = document.getElementById('checkout').value;
+  if (co && co <= val) document.getElementById('checkout').value = '';
+  updateNights();
+  updateSteps();
+});
+
+document.getElementById('checkout').addEventListener('change', function() {
+  const val = this.value;
+  const ci = document.getElementById('checkin').value;
+  if (!val) return;
+  if (isBlocked(val)) {
+    showToast('That check-out date is already booked. Please choose another.', true);
+    this.value = '';
+    return;
+  }
+  if (ci && isRangeBlocked(ci, val)) {
+    showToast('Your selected range includes already-booked dates. Please adjust your dates.', true);
+    this.value = '';
+    return;
+  }
+  updateNights();
+  updateSteps();
+});
 
 function updateNights() {
   const ci = document.getElementById('checkin').value;
@@ -807,7 +891,7 @@ function updateSteps() {
   document.getElementById('step-ind-2').className = 'step ' + (s2done ? 'done' : s1done ? 'active' : '');
   document.getElementById('step-ind-3').className = 'step ' + (s2done ? 'active' : '');
 }
-['primary-name','contact','unit','checkin','checkout'].forEach(id => {
+['primary-name','contact','unit'].forEach(id => {
   document.getElementById(id).addEventListener('change', updateSteps);
   document.getElementById(id).addEventListener('input', updateSteps);
 });
@@ -824,8 +908,8 @@ function showToast(msg, isError = false) {
 function validate() {
   let ok = true;
   const required = [
-    { id: 'primary-name', msg: 'Please enter the primary guest\'s name' },
-    { id: 'contact', msg: 'Please enter a contact number' },
+    { id: 'primary-name' },
+    { id: 'contact' },
   ];
   required.forEach(({ id }) => {
     const el = document.getElementById(id);
@@ -835,16 +919,19 @@ function validate() {
   if (!document.getElementById('unit').value) {
     showToast('Please select a unit.', true); ok = false;
   }
-  if (!document.getElementById('checkin').value) {
-    showToast('Please select a check-in date.', true); ok = false;
-  }
-  if (!document.getElementById('checkout').value) {
-    showToast('Please select a check-out date.', true); ok = false;
-  }
-  const ci = new Date(document.getElementById('checkin').value);
-  const co = new Date(document.getElementById('checkout').value);
+  const ci = document.getElementById('checkin').value;
+  const co = document.getElementById('checkout').value;
+  if (!ci) { showToast('Please select a check-in date.', true); ok = false; }
+  if (!co) { showToast('Please select a check-out date.', true); ok = false; }
   if (ci && co && co <= ci) {
     showToast('Check-out must be after check-in.', true); ok = false;
+  }
+  // Final safety — re-verify against blocked dates
+  if (ci && isBlocked(ci)) {
+    showToast('Check-in date is already booked.', true); ok = false;
+  }
+  if (ci && co && isRangeBlocked(ci, co)) {
+    showToast('Your selected range includes already-booked dates.', true); ok = false;
   }
   return ok;
 }
@@ -875,7 +962,7 @@ async function submitForm() {
   btn.disabled = true;
 
   try {
-    const res = await fetch(APPS_SCRIPT_URL, {
+    await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
@@ -936,6 +1023,7 @@ function resetForm() {
   document.getElementById('checkout').value = '';
   document.getElementById('total-amount').value = '';
   document.getElementById('notes').value = '';
+  blockedDates = [];
   paxCount = 2;
   document.getElementById('pax-val').textContent = '2';
   document.querySelectorAll('.payment-card').forEach(c => {
