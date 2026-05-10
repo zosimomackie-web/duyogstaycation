@@ -701,7 +701,8 @@
             </div>
           </div>
           <div class="field span-2">
-            <label>Payment Channel<span class="required-star">*</span></label>
+            <!-- Payment channel is now optional — asterisk removed -->
+            <label>Payment Channel</label>
             <div class="payment-options">
               <label class="payment-card" id="pay-gcash">
                 <input type="checkbox" value="GCash" onchange="togglePayment(this)"/>
@@ -756,8 +757,6 @@
 
 <script>
 // ─── CONFIG ───────────────────────────────────────────────
-// IMPORTANT: Replace this URL with your Google Apps Script Web App URL
-// See the README section at the bottom of this file for setup instructions
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyk8yqJ0tBIBhwWdKiA1dAFTtxMKWm8BiZk-YsQRG0/dev';
 
 // ─── PAX COUNTER ─────────────────────────────────────────
@@ -825,7 +824,7 @@ function showToast(msg, isError = false) {
 function validate() {
   let ok = true;
   const required = [
-    { id: 'primary-name', msg: 'Please enter the primary guest's name' },
+    { id: 'primary-name', msg: 'Please enter the primary guest\'s name' },
     { id: 'contact', msg: 'Please enter a contact number' },
   ];
   required.forEach(({ id }) => {
@@ -846,10 +845,6 @@ function validate() {
   const co = new Date(document.getElementById('checkout').value);
   if (ci && co && co <= ci) {
     showToast('Check-out must be after check-in.', true); ok = false;
-  }
-  const payments = [...document.querySelectorAll('.payment-card input')].filter(c => c.checked);
-  if (!payments.length) {
-    showToast('Please select at least one payment channel.', true); ok = false;
   }
   return ok;
 }
@@ -919,7 +914,7 @@ function showSuccess(data) {
     ['Nights', nights],
     ['Pax', data.pax],
     ['Contact', data.contact],
-    ['Payment', data.paymentChannel],
+    data.paymentChannel ? ['Payment', data.paymentChannel] : null,
     data.totalAmount ? ['Total', '₱' + Number(data.totalAmount).toLocaleString()] : null,
   ].filter(Boolean);
 
