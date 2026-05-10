@@ -757,7 +757,7 @@
 
 <script>
 // ─── CONFIG ───────────────────────────────────────────────
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyk8yqJ0tBIBhwWdKiA1dAFTtxMKWm8BiZk-YsQRG0/dev';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwjLw7n0qX9FZsMafBXz0bqSIW-F3BFdasciR2sBL8eoqe5Q0cPh35fYtK3uDjF1sF5/exec';
 
 // ─── PAX COUNTER ─────────────────────────────────────────
 let paxCount = 2;
@@ -875,13 +875,6 @@ async function submitForm() {
   btn.disabled = true;
 
   try {
-    if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbyk8yqJ0tBIBhwWdKiA1dAFTtxMKWm8BiZk-YsQRG0/dev') {
-      // DEMO MODE — no real submission
-      await new Promise(r => setTimeout(r, 1200));
-      showSuccess(data);
-      return;
-    }
-
     const res = await fetch(APPS_SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
@@ -1008,7 +1001,7 @@ STEP 3 — Deploy
 
 STEP 4 — Update this file
   • In the <script> section, replace:
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyk8yqJ0tBIBhwWdKiA1dAFTtxMKWm8BiZk-YsQRG0/dev';
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwjLw7n0qX9FZsMafBXz0bqSIW-F3BFdasciR2sBL8eoqe5Q0cPh35fYtK3uDjF1sF5/exec';
   • With your copied URL, e.g.:
     const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/ABC123.../exec';
 
