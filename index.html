@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Casa Huni & Casa Lipay — Book Your Stay</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --white: #ffffff;
+    --off-white: #f7f6f3;
+    --stone-50: #f5f4f0;
+    --stone-100: #e8e6df;
+    --stone-200: #d0cdc3;
+    --stone-400: #9c9990;
+    --stone-600: #6b6860;
+    --stone-800: #3a3834;
+    --stone-900: #1e1d1a;
+    --accent: #2d4a3e;
+    --accent-light: #3d6b59;
+    --accent-pale: #edf2f0;
+    --gold: #b8975a;
+    --gold-light: #f5edd9;
+    --danger: #c0392b;
+    --success: #27ae60;
+    --radius: 4px;
+    --radius-lg: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    --shadow-md: 0 2px 8px rgba(0,0,0,0.08), 0 8px 32px rgba(0,0,0,0.06);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--off-white);
+    color: var(--stone-900);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--accent);
+    color: white;
+    padding: 3.5rem 2rem 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 60px,
+      rgba(255,255,255,0.015) 60px,
+      rgba(255,255,255,0.015) 61px
+    );
+  }
+  .header-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 0.75rem;
+  }
+  header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    color: white;
+    margin-bottom: 0.5rem;
+  }
+  header h1 span {
+    color: var(--gold);
+  }
+  header p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 300;
+  }
+
+  /* STEP INDICATOR */
+  .steps-bar {
+    background: var(--white);
+    border-bottom: 1px solid var(--stone-100);
+    padding: 0 2rem;
+    display: flex;
+    justify-content: center;
+  }
+  .steps {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    max-width: 560px;
+    width: 100%;
+  }
+  .step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 0.5rem;
+    position: relative;
+    gap: 6px;
+  }
+  .step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -1px;
+    transform: translateY(-50%);
+    width: 30px;
+    height: 1px;
+    background: var(--stone-200);
+  }
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1.5px solid var(--stone-200);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--stone-400);
+    background: var(--white);
+    transition: all 0.25s;
+  }
+  .step-label {
+    font-size: 11px;
+    color: var(--stone-400);
+    font-weight: 400;
+    white-space: nowrap;
+  }
+  .step.active .step-num {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  .step.active .step-label { color: var(--accent); font-weight: 500; }
+  .step.done .step-num {
+    background: var(--accent-pale);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .step.done .step-label { color: var(--accent); }
+
+  /* MAIN LAYOUT */
+  main {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 5rem;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--stone-100);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    animation: fadeUp 0.3s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .card-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--stone-100);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .card-icon {
+    width: 38px;
+    height: 38px;
+    background: var(--accent-pale);
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.35rem;
+    font-weight: 500;
+    color: var(--stone-900);
+  }
+  .card-subtitle {
+    font-size: 12px;
+    color: var(--stone-400);
+    margin-top: 1px;
+  }
+  .card-body { padding: 2rem; }
+
+  /* FORM */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+  .form-grid .span-2 { grid-column: span 2; }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--stone-600);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  .required-star { color: var(--gold); margin-left: 2px; }
+
+  .field input,
+  .field select,
+  .field textarea {
+    background: var(--stone-50);
+    border: 1px solid var(--stone-200);
+    border-radius: var(--radius);
+    padding: 0.65rem 0.875rem;
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--stone-900);
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    outline: none;
+    width: 100%;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .field input::placeholder { color: var(--stone-400); }
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    border-color: var(--accent);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(45,74,62,0.08);
+  }
+  .field input.error { border-color: var(--danger); }
+  .error-msg { font-size: 11.5px; color: var(--danger); display: none; margin-top: 2px; }
+  .field input.error ~ .error-msg { display: block; }
+
+  .select-wrap { position: relative; }
+  .select-wrap select {
+    cursor: pointer;
+    padding-right: 2.5rem;
+  }
+  .select-wrap::after {
+    content: '';
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid var(--stone-400);
+    pointer-events: none;
+  }
+
+  /* DATE HELPER */
+  .date-note {
+    font-size: 11px;
+    color: var(--stone-400);
+    margin-top: 3px;
+  }
+
+  /* PAX COUNTER */
+  .pax-control {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border: 1px solid var(--stone-200);
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: var(--stone-50);
+  }
+  .pax-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 18px;
+    color: var(--stone-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .pax-btn:hover { background: var(--stone-100); }
+  .pax-val {
+    flex: 1;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--stone-900);
+    padding: 0.5rem;
+    user-select: none;
+  }
+
+  /* DIVIDER */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--stone-100);
+    margin: 1.75rem 0;
+  }
+
+  /* PAYMENT CARDS */
+  .payment-options {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+  }
+  .payment-card {
+    border: 1.5px solid var(--stone-200);
+    border-radius: var(--radius);
+    padding: 0.875rem 0.75rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--stone-50);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .payment-card:hover {
+    border-color: var(--accent);
+    background: var(--accent-pale);
+  }
+  .payment-card.selected {
+    border-color: var(--accent);
+    background: var(--accent-pale);
+  }
+  .payment-card input[type="checkbox"] { display: none; }
+  .payment-logo {
+    font-size: 22px;
+    line-height: 1;
+  }
+  .payment-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--stone-700);
+  }
+  .payment-check {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid var(--stone-300);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .payment-card.selected .payment-check {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .payment-card.selected .payment-check::after {
+    content: '';
+    width: 5px;
+    height: 9px;
+    border: 2px solid white;
+    border-top: none;
+    border-left: none;
+    transform: rotate(45deg) translateY(-1px);
+    display: block;
+  }
+
+  /* AMOUNT */
+  .amount-wrap { position: relative; }
+  .amount-prefix {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    color: var(--stone-400);
+    font-weight: 500;
+    pointer-events: none;
+  }
+  .amount-wrap input { padding-left: 2rem; }
+
+  /* SUBMIT */
+  .form-footer {
+    padding: 1.5rem 2rem;
+    border-top: 1px solid var(--stone-100);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .form-note {
+    font-size: 12px;
+    color: var(--stone-400);
+  }
+  .btn-submit {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    padding: 0.75rem 2rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    letter-spacing: 0.02em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-submit:hover { background: var(--accent-light); }
+  .btn-submit:active { transform: scale(0.98); }
+  .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* SUCCESS */
+  .success-card {
+    background: var(--white);
+    border: 1px solid var(--stone-100);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 3.5rem 2rem;
+    text-align: center;
+    animation: fadeUp 0.4s ease;
+    display: none;
+  }
+  .success-icon {
+    width: 64px;
+    height: 64px;
+    background: var(--accent-pale);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: var(--accent);
+    font-size: 28px;
+  }
+  .success-card h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2rem;
+    font-weight: 400;
+    color: var(--stone-900);
+    margin-bottom: 0.5rem;
+  }
+  .success-card p {
+    color: var(--stone-400);
+    font-size: 14px;
+    max-width: 380px;
+    margin: 0 auto 2rem;
+    line-height: 1.7;
+  }
+  .summary-box {
+    background: var(--stone-50);
+    border: 1px solid var(--stone-100);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    text-align: left;
+    max-width: 440px;
+    margin: 0 auto 1.75rem;
+  }
+  .summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding: 4px 0;
+    font-size: 13.5px;
+  }
+  .summary-row + .summary-row { border-top: 1px solid var(--stone-100); }
+  .summary-label { color: var(--stone-400); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+  .summary-val { color: var(--stone-900); font-weight: 400; text-align: right; }
+  .btn-new {
+    background: transparent;
+    border: 1.5px solid var(--accent);
+    color: var(--accent);
+    border-radius: var(--radius);
+    padding: 0.7rem 1.75rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+  .btn-new:hover { background: var(--accent-pale); }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--stone-900);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius);
+    font-size: 13.5px;
+    opacity: 0;
+    transition: all 0.3s;
+    z-index: 999;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .toast.error { background: var(--danger); }
+
+  /* SPINNER */
+  .spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .btn-submit.loading .spinner { display: block; }
+  .btn-submit.loading .btn-text { display: none; }
+
+  /* BANNER */
+  .info-banner {
+    background: var(--gold-light);
+    border: 1px solid rgba(184,151,90,0.3);
+    border-radius: var(--radius);
+    padding: 0.75rem 1rem;
+    font-size: 12.5px;
+    color: #7a5c25;
+    margin-bottom: 1.5rem;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  .info-banner svg { flex-shrink: 0; margin-top: 1px; }
+
+  @media (max-width: 560px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .form-grid .span-2 { grid-column: span 1; }
+    .payment-options { grid-template-columns: 1fr 1fr 1fr; }
+    .card-body { padding: 1.25rem; }
+    header { padding: 2.5rem 1rem 2rem; }
+    .form-footer { flex-direction: column; align-items: stretch; }
+    .btn-submit { justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="header-eyebrow">Sublease Accommodation</p>
+  <h1>Casa Huni <span>&</span> Casa Lipay</h1>
+  <p>Reserve your stay — fill in the details below</p>
+</header>
+
+<div class="steps-bar">
+  <div class="steps">
+    <div class="step active" id="step-ind-1">
+      <div class="step-num">1</div>
+      <div class="step-label">Guest Info</div>
+    </div>
+    <div class="step" id="step-ind-2">
+      <div class="step-num">2</div>
+      <div class="step-label">Stay Details</div>
+    </div>
+    <div class="step" id="step-ind-3">
+      <div class="step-num">3</div>
+      <div class="step-label">Payment</div>
+    </div>
+  </div>
+</div>
+
+<main>
+  <!-- FORM CARD -->
+  <div class="card" id="form-card">
+
+    <!-- SECTION 1: Guest Info -->
+    <div id="sec-1">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div>
+          <div class="card-title">Guest Information</div>
+          <div class="card-subtitle">Primary and additional guests</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="field span-2">
+            <label>Primary Guest's Name<span class="required-star">*</span></label>
+            <input type="text" id="primary-name" placeholder="Full name" autocomplete="name" />
+            <span class="error-msg">Please enter the primary guest's name</span>
+          </div>
+          <div class="field span-2">
+            <label>Other Guests' Names</label>
+            <input type="text" id="other-guests" placeholder="e.g. Maria Santos, Juan Dela Cruz" />
+          </div>
+          <div class="field">
+            <label>Contact Number<span class="required-star">*</span></label>
+            <input type="tel" id="contact" placeholder="+63 9XX XXX XXXX" />
+            <span class="error-msg">Please enter a contact number</span>
+          </div>
+          <div class="field">
+            <label>No. of Pax<span class="required-star">*</span></label>
+            <div class="pax-control">
+              <button type="button" class="pax-btn" id="pax-minus">−</button>
+              <div class="pax-val" id="pax-val">2</div>
+              <button type="button" class="pax-btn" id="pax-plus">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider" style="margin: 0;"/>
+
+    <!-- SECTION 2: Stay Details -->
+    <div id="sec-2">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div>
+          <div class="card-title">Stay Details</div>
+          <div class="card-subtitle">Unit selection and dates</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="field span-2">
+            <label>Unit<span class="required-star">*</span></label>
+            <div class="select-wrap">
+              <select id="unit">
+                <option value="" disabled selected>Select a unit</option>
+                <option value="Casa Huni">Casa Huni</option>
+                <option value="Casa Lipay">Casa Lipay</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Check-In Date<span class="required-star">*</span></label>
+            <input type="date" id="checkin" />
+            <div class="date-note">Check-in at 2:00 PM</div>
+          </div>
+          <div class="field">
+            <label>Check-Out Date<span class="required-star">*</span></label>
+            <input type="date" id="checkout" />
+            <div class="date-note">Check-out at 11:00 AM</div>
+          </div>
+        </div>
+
+        <!-- Nights summary -->
+        <div id="nights-banner" style="display:none; margin-top:1rem;">
+          <div class="info-banner">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span id="nights-text"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider" style="margin: 0;"/>
+
+    <!-- SECTION 3: Payment -->
+    <div id="sec-3">
+      <div class="card-header">
+        <div class="card-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        </div>
+        <div>
+          <div class="card-title">Payment Details</div>
+          <div class="card-subtitle">Amount and preferred channel</div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="field span-2">
+            <label>Total Amount</label>
+            <div class="amount-wrap">
+              <span class="amount-prefix">₱</span>
+              <input type="number" id="total-amount" placeholder="0.00" min="0" step="0.01"/>
+            </div>
+          </div>
+          <div class="field span-2">
+            <label>Payment Channel<span class="required-star">*</span></label>
+            <div class="payment-options">
+              <label class="payment-card" id="pay-gcash">
+                <input type="checkbox" value="GCash" onchange="togglePayment(this)"/>
+                <div class="payment-logo">💚</div>
+                <div class="payment-name">GCash</div>
+                <div class="payment-check"></div>
+              </label>
+              <label class="payment-card" id="pay-bank">
+                <input type="checkbox" value="Bank Transfer" onchange="togglePayment(this)"/>
+                <div class="payment-logo">🏦</div>
+                <div class="payment-name">Bank Transfer</div>
+                <div class="payment-check"></div>
+              </label>
+              <label class="payment-card" id="pay-mari">
+                <input type="checkbox" value="Maribank" onchange="togglePayment(this)"/>
+                <div class="payment-logo">🟣</div>
+                <div class="payment-name">Maribank</div>
+                <div class="payment-check"></div>
+              </label>
+            </div>
+          </div>
+          <div class="field span-2">
+            <label>Additional Notes</label>
+            <textarea id="notes" rows="3" placeholder="Any special requests or notes..." style="resize:vertical;"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-footer">
+      <p class="form-note">Fields marked <span style="color:var(--gold)">*</span> are required</p>
+      <button class="btn-submit" id="submit-btn" onclick="submitForm()">
+        <span class="btn-text">Submit Booking</span>
+        <div class="spinner"></div>
+      </button>
+    </div>
+  </div>
+
+  <!-- SUCCESS CARD -->
+  <div class="success-card" id="success-card">
+    <div class="success-icon">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    </div>
+    <h2>Booking Received!</h2>
+    <p>Thank you for your reservation. Your booking has been recorded and we'll confirm shortly via your contact number.</p>
+    <div class="summary-box" id="summary-box"></div>
+    <button class="btn-new" onclick="resetForm()">Submit Another Booking</button>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────
+// IMPORTANT: Replace this URL with your Google Apps Script Web App URL
+// See the README section at the bottom of this file for setup instructions
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyk8yqJ0tBIBhwWdKiA1dAFTtxMKWm8BiZk-YsQRG0/dev';
+
+// ─── PAX COUNTER ─────────────────────────────────────────
+let paxCount = 2;
+document.getElementById('pax-minus').onclick = () => { if(paxCount > 1) { paxCount--; document.getElementById('pax-val').textContent = paxCount; } };
+document.getElementById('pax-plus').onclick = () => { if(paxCount < 20) { paxCount++; document.getElementById('pax-val').textContent = paxCount; } };
+
+// ─── PAYMENT TOGGLE ───────────────────────────────────────
+function togglePayment(cb) {
+  cb.closest('.payment-card').classList.toggle('selected', cb.checked);
+}
+
+// ─── DATE LOGIC ───────────────────────────────────────────
+const today = new Date().toISOString().split('T')[0];
+document.getElementById('checkin').min = today;
+document.getElementById('checkout').min = today;
+
+document.getElementById('checkin').addEventListener('change', updateNights);
+document.getElementById('checkout').addEventListener('change', updateNights);
+
+function updateNights() {
+  const ci = document.getElementById('checkin').value;
+  const co = document.getElementById('checkout').value;
+  const banner = document.getElementById('nights-banner');
+  if (!ci || !co) { banner.style.display = 'none'; return; }
+  const diff = (new Date(co) - new Date(ci)) / 86400000;
+  if (diff <= 0) {
+    document.getElementById('nights-text').textContent = 'Check-out must be after check-in.';
+    banner.style.display = 'flex';
+    return;
+  }
+  document.getElementById('nights-text').textContent = `${diff} night${diff > 1 ? 's' : ''} — Check-in 2:00 PM · Check-out 11:00 AM`;
+  banner.style.display = 'flex';
+}
+
+// ─── STEP INDICATOR ───────────────────────────────────────
+function updateSteps() {
+  const name = document.getElementById('primary-name').value.trim();
+  const contact = document.getElementById('contact').value.trim();
+  const unit = document.getElementById('unit').value;
+  const ci = document.getElementById('checkin').value;
+  const co = document.getElementById('checkout').value;
+
+  const s1done = name && contact;
+  const s2done = unit && ci && co;
+
+  document.getElementById('step-ind-1').className = 'step ' + (s1done ? 'done' : 'active');
+  document.getElementById('step-ind-2').className = 'step ' + (s2done ? 'done' : s1done ? 'active' : '');
+  document.getElementById('step-ind-3').className = 'step ' + (s2done ? 'active' : '');
+}
+['primary-name','contact','unit','checkin','checkout'].forEach(id => {
+  document.getElementById(id).addEventListener('change', updateSteps);
+  document.getElementById(id).addEventListener('input', updateSteps);
+});
+
+// ─── TOAST ────────────────────────────────────────────────
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  setTimeout(() => { t.className = 'toast'; }, 3500);
+}
+
+// ─── VALIDATE ─────────────────────────────────────────────
+function validate() {
+  let ok = true;
+  const required = [
+    { id: 'primary-name', msg: 'Please enter the primary guest's name' },
+    { id: 'contact', msg: 'Please enter a contact number' },
+  ];
+  required.forEach(({ id }) => {
+    const el = document.getElementById(id);
+    if (!el.value.trim()) { el.classList.add('error'); ok = false; }
+    else el.classList.remove('error');
+  });
+  if (!document.getElementById('unit').value) {
+    showToast('Please select a unit.', true); ok = false;
+  }
+  if (!document.getElementById('checkin').value) {
+    showToast('Please select a check-in date.', true); ok = false;
+  }
+  if (!document.getElementById('checkout').value) {
+    showToast('Please select a check-out date.', true); ok = false;
+  }
+  const ci = new Date(document.getElementById('checkin').value);
+  const co = new Date(document.getElementById('checkout').value);
+  if (ci && co && co <= ci) {
+    showToast('Check-out must be after check-in.', true); ok = false;
+  }
+  const payments = [...document.querySelectorAll('.payment-card input')].filter(c => c.checked);
+  if (!payments.length) {
+    showToast('Please select at least one payment channel.', true); ok = false;
+  }
+  return ok;
+}
+
+// ─── SUBMIT ───────────────────────────────────────────────
+async function submitForm() {
+  if (!validate()) return;
+
+  const payments = [...document.querySelectorAll('.payment-card input')]
+    .filter(c => c.checked).map(c => c.value).join(', ');
+
+  const data = {
+    timestamp: new Date().toLocaleString('en-PH', { timeZone: 'Asia/Manila' }),
+    primaryName: document.getElementById('primary-name').value.trim(),
+    otherGuests: document.getElementById('other-guests').value.trim(),
+    unit: document.getElementById('unit').value,
+    checkIn: document.getElementById('checkin').value,
+    checkOut: document.getElementById('checkout').value,
+    pax: paxCount,
+    contact: document.getElementById('contact').value.trim(),
+    totalAmount: document.getElementById('total-amount').value || '',
+    paymentChannel: payments,
+    notes: document.getElementById('notes').value.trim(),
+  };
+
+  const btn = document.getElementById('submit-btn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  try {
+    if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbyk8yqJ0tBIBhwWdKiA1dAFTtxMKWm8BiZk-YsQRG0/dev') {
+      // DEMO MODE — no real submission
+      await new Promise(r => setTimeout(r, 1200));
+      showSuccess(data);
+      return;
+    }
+
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    showSuccess(data);
+  } catch (err) {
+    showToast('Submission failed. Please try again.', true);
+  } finally {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+}
+
+function showSuccess(data) {
+  document.getElementById('form-card').style.display = 'none';
+  const sc = document.getElementById('success-card');
+  sc.style.display = 'block';
+
+  const nights = data.checkIn && data.checkOut
+    ? Math.round((new Date(data.checkOut) - new Date(data.checkIn)) / 86400000)
+    : '—';
+
+  const rows = [
+    ['Guest', data.primaryName],
+    ['Unit', data.unit],
+    ['Check-In', formatDate(data.checkIn) + ' · 2:00 PM'],
+    ['Check-Out', formatDate(data.checkOut) + ' · 11:00 AM'],
+    ['Nights', nights],
+    ['Pax', data.pax],
+    ['Contact', data.contact],
+    ['Payment', data.paymentChannel],
+    data.totalAmount ? ['Total', '₱' + Number(data.totalAmount).toLocaleString()] : null,
+  ].filter(Boolean);
+
+  document.getElementById('summary-box').innerHTML = rows.map(([l, v]) =>
+    `<div class="summary-row"><span class="summary-label">${l}</span><span class="summary-val">${v}</span></div>`
+  ).join('');
+
+  ['step-ind-1','step-ind-2','step-ind-3'].forEach(id => {
+    document.getElementById(id).className = 'step done';
+  });
+}
+
+function formatDate(d) {
+  if (!d) return '—';
+  return new Date(d + 'T12:00:00').toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+function resetForm() {
+  document.getElementById('success-card').style.display = 'none';
+  document.getElementById('form-card').style.display = 'block';
+  document.getElementById('primary-name').value = '';
+  document.getElementById('other-guests').value = '';
+  document.getElementById('contact').value = '';
+  document.getElementById('unit').value = '';
+  document.getElementById('checkin').value = '';
+  document.getElementById('checkout').value = '';
+  document.getElementById('total-amount').value = '';
+  document.getElementById('notes').value = '';
+  paxCount = 2;
+  document.getElementById('pax-val').textContent = '2';
+  document.querySelectorAll('.payment-card').forEach(c => {
+    c.classList.remove('selected');
+    c.querySelector('input').checked = false;
+  });
+  document.getElementById('nights-banner').style.display = 'none';
+  ['step-ind-1','step-ind-2','step-ind-3'].forEach((id, i) => {
+    document.getElementById(id).className = 'step' + (i === 0 ? ' active' : '');
+  });
+}
+</script>
+
+<!--
+═══════════════════════════════════════════════════════════════
+  HOW TO CONNECT TO GOOGLE SHEETS (Apps Script Setup)
+═══════════════════════════════════════════════════════════════
+
+STEP 1 — Create a Google Sheet
+  • Go to sheets.google.com and create a new spreadsheet
+  • Name it "Casa Huni & Lipay Bookings"
+  • Add these headers in Row 1 (one per column):
+    Timestamp | Primary Guest | Other Guests | Unit | Check-In | Check-Out | No. of Pax | Contact Number | Total Amount | Payment Channel | Notes
+
+STEP 2 — Open Apps Script
+  • In your sheet, click Extensions → Apps Script
+  • Delete any existing code and paste this:
+
+  function doPost(e) {
+    try {
+      var data = JSON.parse(e.postData.contents);
+      var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+      sheet.appendRow([
+        data.timestamp,
+        data.primaryName,
+        data.otherGuests,
+        data.unit,
+        data.checkIn,
+        data.checkOut,
+        data.pax,
+        data.contact,
+        data.totalAmount,
+        data.paymentChannel,
+        data.notes
+      ]);
+      return ContentService
+        .createTextOutput(JSON.stringify({ success: true }))
+        .setMimeType(ContentService.MimeType.JSON);
+    } catch(err) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ error: err.message }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+  }
+
+STEP 3 — Deploy
+  • Click Deploy → New Deployment
+  • Type: Web App
+  • Execute as: Me
+  • Who has access: Anyone
+  • Click Deploy, authorize the permissions
+  • Copy the Web App URL provided
+
+STEP 4 — Update this file
+  • In the <script> section, replace:
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyk8yqJ0tBIBhwWdKiA1dAFTtxMKWm8BiZk-YsQRG0/dev';
+  • With your copied URL, e.g.:
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/ABC123.../exec';
+
+That's it! Every submission will now appear as a new row in your Google Sheet.
+═══════════════════════════════════════════════════════════════
+-->
+</body>
+</html>
